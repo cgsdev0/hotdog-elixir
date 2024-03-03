@@ -1,7 +1,8 @@
 defmodule HotDogServer do
+  require Logger
+  
   @hotdog File.read!("hotdog") |> String.trim()
   @mustard File.read!("mustard") |> String.trim()
-  require Logger
 
   def accept(port) do
     {:ok, socket} =
@@ -17,41 +18,34 @@ defmodule HotDogServer do
   end
 
   def serve(socket) do
-    with {:ok, data} <- :gen_tcp.recv(socket, 0) do
+    with {:ok, data} <- :gen_tcp.recv(socket, 0),
+         :continue <- read_line(data, socket) do
       IO.inspect(data)
-      if accumulate(data, socket) do
-        serve(socket)
-      end
+      serve(socket)
     end
-  end
-
-  def write_thing_part_2(socket, :mustard) do
-    write_line(@mustard, socket)
-  end
-
-  def write_thing_part_2(socket, :hotdog) do
-    write_line(@hotdog, socket)
   end
 
   def hotdog(socket, style) do
-    case write_thing_part_2(socket, style) do
-      {:error, _} -> :closed
-      :ok ->
-        :timer.sleep(1000)
-        hotdog(socket, if(style == :hotdog, do: :mustard, else: :hotdog))
+    with :ok <- write_line(content(style), socket) do
+      :timer.sleep(1000)
+      hotdog(socket, flip(style))
     end
   end
+  
+  def flip(:hotdog), do: :mustard
+  def flip(:mustard), do: :hotdog
+  
+  def content(:hotdog), do: @hotdog
+  def content(:mustard), do: @mustard
 
-  def accumulate("\r\n", socket) do
+  def read_line("\r\n", socket) do
     write_line("HTTP/1.1 200 OK\r\n", socket)
     write_line("\r\n", socket)
     hotdog(socket, :hotdog)
   end
 
-  def accumulate(_not_rn_lol, _socket) do
-    :ok
-  end
-
+  def read_line(_not_rn_lol, _socket), do: :continue
+    
   def write_line(line, socket) do
     :gen_tcp.send(socket, line)
   end
