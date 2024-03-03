@@ -1,4 +1,5 @@
 defmodule HotDogServer do
+  @hotdog File.read!("hotdog")
   require Logger
 
   def accept(port) do
@@ -26,7 +27,7 @@ defmodule HotDogServer do
   def accumulate("\r\n", socket) do
     write_line("HTTP/1.1 200 OK\r\n", socket)
     write_line("\r\n", socket)
-    write_line(File.read!("hotdog"), socket)
+    write_line(@hotdog, socket)
     write_line("hotdog delivered 🌭", socket)
     write_line("\r\n", socket)
     :gen_tcp.close(socket)
