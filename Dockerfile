@@ -45,6 +45,7 @@ RUN mix deps.compile
 COPY lib lib
 
 COPY hotdog  ./
+COPY mustard  ./
 
 # Compile the release.
 RUN mix compile
