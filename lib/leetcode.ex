@@ -25,8 +25,16 @@ defmodule HotDogServer do
     end
   end
 
+  def read_line("\r\n", socket) do
+    :gen_tcp.send(socket, "HTTP/1.1 200 OK\r\n")
+    :gen_tcp.send(socket, "\r\n")
+    hotdog(socket, :hotdog)
+  end
+
+  def read_line(_not_rn_lol, _socket), do: :continue
+  
   def hotdog(socket, style) do
-    with :ok <- write_line(content(style), socket) do
+    with :ok <- :gen_tcp.send(socket, content(style)) do
       :timer.sleep(1000)
       hotdog(socket, flip(style))
     end
@@ -37,16 +45,4 @@ defmodule HotDogServer do
   
   def content(:hotdog), do: @hotdog
   def content(:mustard), do: @mustard
-
-  def read_line("\r\n", socket) do
-    write_line("HTTP/1.1 200 OK\r\n", socket)
-    write_line("\r\n", socket)
-    hotdog(socket, :hotdog)
-  end
-
-  def read_line(_not_rn_lol, _socket), do: :continue
-    
-  def write_line(line, socket) do
-    :gen_tcp.send(socket, line)
-  end
 end
