@@ -1,15 +1,15 @@
-# fly.toml app configuration file generated for hotdog-elixir-wispy-rain-7969-polished-voice-5872-aged-tree-5027-summer-flower-8153-black-sea-7340-polished-sunset-3906 on 2024-03-02T23:09:40-08:00
+# fly.toml app configuration file generated for hotdog-elixir on 2024-03-02T23:39:48-08:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = 'hotdog-elixir-wispy-rain-7969-polished-voice-5872-aged-tree-5027-summer-flower-8153-black-sea-7340-polished-sunset-3906'
+app = 'hotdog-elixir'
 primary_region = 'sjc'
 
 [build]
 
 [http_service]
-  internal_port = 8080
+  internal_port = 42069
   force_https = true
   auto_stop_machines = true
   auto_start_machines = true
