@@ -1,6 +1,6 @@
 defmodule HotDogServer do
   require Logger
-  
+
   @hotdog File.read!("hotdog") |> String.trim()
   @mustard File.read!("mustard") |> String.trim()
 
@@ -20,7 +20,7 @@ defmodule HotDogServer do
   def serve(socket) do
     with {:ok, data} <- :gen_tcp.recv(socket, 0),
          :continue <- read_line(data, socket) do
-      IO.inspect(data)
+      IO.write(data)
       serve(socket)
     end
   end
@@ -32,17 +32,17 @@ defmodule HotDogServer do
   end
 
   def read_line(_not_rn_lol, _socket), do: :continue
-  
+
   def hotdog(socket, style) do
     with :ok <- :gen_tcp.send(socket, content(style)) do
       :timer.sleep(1000)
       hotdog(socket, flip(style))
     end
   end
-  
+
   def flip(:hotdog), do: :mustard
   def flip(:mustard), do: :hotdog
-  
+
   def content(:hotdog), do: @hotdog
   def content(:mustard), do: @mustard
 end
